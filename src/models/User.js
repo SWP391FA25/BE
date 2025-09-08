@@ -8,8 +8,10 @@ const userSchema = new mongoose.Schema({
   licenseNumber: String,
   nationalId: String,
   nationalIdImage: String,
+  driverLicenseImage: String,
   verified: { type: Boolean, default: false },
-  verifyNote: String
+  verifyNote: String,
+  risky: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model("User", userSchema);

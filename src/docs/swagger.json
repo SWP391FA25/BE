@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "EV Rental API",
+    "version": "1.0.0",
+    "description": "Tài liệu API cho hệ thống thuê xe điện"
+  },
+  "servers": [
+    { "url": "/" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["email", "password"]
+      },
+      "Station": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "longitude": { "type": "number" },
+          "latitude": { "type": "number" },
+          "phone": { "type": "string" },
+          "active": { "type": "boolean" }
+        },
+        "required": ["name", "address", "longitude", "latitude"]
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "plateNumber": { "type": "string" },
+          "model": { "type": "string" },
+          "type": { "type": "string", "enum": ["scooter", "bike", "car"] },
+          "batteryCapacityKWh": { "type": "number" },
+          "station": { "type": "string" }
+        },
+        "required": ["plateNumber", "model", "type", "batteryCapacityKWh"]
+      }
+    }
+  },
+  "tags": [
+    { "name": "Auth" },
+    { "name": "Admin" },
+    { "name": "Staff" },
+    { "name": "Renter" }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LoginRequest"}}}},
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "email": {"type": "string"},
+                  "password": {"type": "string"},
+                  "licenseNumber": {"type": "string"},
+                  "nationalId": {"type": "string"},
+                  "cccdImage": {"type": "string", "format": "binary"},
+                  "driverLicenseImage": {"type": "string", "format": "binary"}
+                },
+                "required": ["name","email","password","licenseNumber","nationalId","cccdImage","driverLicenseImage"]
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/admin/stations": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+      "post": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Station"}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/api/admin/stations/{id}": {
+      "put": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}},
+      "delete": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/vehicles": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "station", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}},
+      "post": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Vehicle"}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/api/admin/vehicles/{id}": {
+      "put": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}},
+      "delete": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/staff": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+      "post": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"name": {"type": "string"}, "email": {"type": "string"}, "password": {"type": "string"}}, "required": ["name","email","password"]}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/api/admin/staff/{id}": {
+      "put": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}},
+      "delete": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/customers": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/customers/{id}/risky": {
+      "patch": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"risky": {"type": "boolean"}}, "required": ["risky"]}}}}, "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/reports/revenue-by-station": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "start", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "end", "in": "query", "schema": {"type": "string", "format": "date-time"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/reports/utilization": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "start", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "end", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "station", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/admin/reports/peak-hours": {
+      "get": {"tags": ["Admin"], "security": [{"bearerAuth": []}], "parameters": [{"name": "start", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "end", "in": "query", "schema": {"type": "string", "format": "date-time"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/staff/vehicles": {
+      "get": {"tags": ["Staff"], "security": [{"bearerAuth": []}], "parameters": [{"name": "station", "in": "query", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/staff/vehicles/{id}": {
+      "put": {"tags": ["Staff"], "security": [{"bearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/staff/pending-users": {
+      "get": {"tags": ["Staff"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/staff/verify": {
+      "post": {"tags": ["Staff"], "security": [{"bearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"userId": {"type": "string"}, "status": {"type": "string", "enum": ["approved","rejected"]}, "note": {"type": "string"}}, "required": ["userId","status"]}}}}, "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/staff/rental/checkout": {
+      "post": {
+        "tags": ["Staff"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"type": "object", "properties": {"rentalId": {"type": "string"}, "renterId": {"type": "string"}, "vehicleId": {"type": "string"}, "pickupStationId": {"type": "string"}, "pricePerHour": {"type": "number"}, "depositAmount": {"type": "number"}, "batteryPct": {"type": "number"}, "note": {"type": "string"}, "photos": {"type": "array", "items": {"type": "string", "format": "binary"}}}}}}},
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/staff/rental/checkin": {
+      "post": {
+        "tags": ["Staff"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"type": "object", "properties": {"rentalId": {"type": "string"}, "dropoffStationId": {"type": "string"}, "batteryPct": {"type": "number"}, "note": {"type": "string"}, "distanceKm": {"type": "number"}, "photos": {"type": "array", "items": {"type": "string", "format": "binary"}}}}}}},
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/renter/stations/nearby": {
+      "get": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "parameters": [{"name": "lng", "in": "query", "required": true, "schema": {"type": "number"}}, {"name": "lat", "in": "query", "required": true, "schema": {"type": "number"}}, {"name": "radiusKm", "in": "query", "schema": {"type": "number"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/renter/vehicles/available": {
+      "get": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "parameters": [{"name": "stationId", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/renter/reservations": {
+      "post": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"vehicleId": {"type": "string"}, "pickupStationId": {"type": "string"}, "pricePerHour": {"type": "number"}, "depositAmount": {"type": "number"}}, "required": ["vehicleId", "pickupStationId"]}}}}, "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/renter/me/rentals": {
+      "get": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/renter/me/analytics": {
+      "get": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+    }
+  }
+}
+
+

@@ -1,6 +1,8 @@
 # Node modules
 node_modules/
 
+* text=auto eol=lf
+
 # Environment variables
 .env
 .env.local
