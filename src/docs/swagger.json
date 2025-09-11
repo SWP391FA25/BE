@@ -47,6 +47,35 @@
           "station": { "type": "string" }
         },
         "required": ["plateNumber", "model", "type", "batteryCapacityKWh"]
+      },
+      "PaymentRequest": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "vehicleId": { "type": "string" },
+          "amount": { "type": "number" },
+          "returnUrl": { "type": "string" },
+          "cancelUrl": { "type": "string" }
+        },
+        "required": ["userId", "vehicleId", "amount"]
+      },
+      "PaymentStatus": {
+        "type": "object",
+        "properties": {
+          "newStatus": { 
+            "type": "string", 
+            "enum": ["pending", "success", "failed", "cancelled"] 
+          }
+        },
+        "required": ["newStatus"]
+      },
+      "WebhookRequest": {
+        "type": "object",
+        "properties": {
+          "paymentStatus": { "type": "string" },
+          "orderCode": { "type": "string" }
+        },
+        "required": ["paymentStatus", "orderCode"]
       }
     }
   },
@@ -54,7 +83,8 @@
     { "name": "Auth" },
     { "name": "Admin" },
     { "name": "Staff" },
-    { "name": "Renter" }
+    { "name": "Renter" },
+    { "name": "Payment" }
   ],
   "paths": {
     "/api/auth/login": {
@@ -171,6 +201,41 @@
     },
     "/api/renter/me/analytics": {
       "get": {"tags": ["Renter"], "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+    },
+    "/api/chatboxai": {
+      "post": {
+        "tags": ["Chatbox"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reply": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
