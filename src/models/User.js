@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, auto: true }, // Primary Key
-  roleId: { type: mongoose.Schema.Types.ObjectId, ref: "Role" }, // FK tới bảng Role
-
   email: { type: String, unique: true, required: true },
   passwordHash: { type: String, required: true },
 
@@ -27,6 +24,8 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+
+
 
 // Middleware để update updatedAt khi save
 userSchema.pre("save", function (next) {
