@@ -5,12 +5,12 @@ const jwt = require("jsonwebtoken");
 // 📌 Đăng ký (upload CCCD + Bằng lái)
 const register = async (req, res) => {
   try {
-    const { name, email, password, licenseNumber, nationalId } = req.body;
+    const { fullName, email, password, licenseNumber, nationalId, phone, dob, address, roleId } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Validate bắt buộc
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Thiếu name/email/password" });
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "Thiếu fullName/email/password" });
     }
     if (!licenseNumber || !nationalId) {
       return res.status(400).json({ message: "Thiếu licenseNumber/nationalId" });
@@ -22,15 +22,18 @@ const register = async (req, res) => {
     }
 
     const newUser = new User({
-      name,
+      fullName,
       email,
-      password: hashedPassword,
-      role: "renter",
+      passwordHash: hashedPassword,
+      roleId: roleId || null, // Nếu có truyền roleId thì dùng, không thì null
+      phone,
+      dob,
+      address,
       licenseNumber,
       nationalId,
       nationalIdImage: req.files.cccdImage[0].path,
       driverLicenseImage: req.files.driverLicenseImage[0].path,
-      verified: false,
+      isVerified: false,
       verifyNote: ""
     });
 
@@ -48,16 +51,16 @@ const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, roleId: user.roleId },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ token, role: user.role, verified: user.verified });
+    res.json({ token, roleId: user.roleId, isVerified: user.isVerified });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
