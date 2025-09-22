@@ -66,4 +66,6 @@ const login = async (req, res) => {
   }
 };
 
+//đăng ký
+
 module.exports = { register, login };
