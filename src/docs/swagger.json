@@ -100,19 +100,42 @@
         "requestBody": {
           "required": true,
           "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {"type": "string"},
+                  "email": {"type": "string"},
+                  "password": {"type": "string"}
+                },
+                "required": ["fullName","email","password"]
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/auth/me/profile": {
+      "put": {
+        "tags": ["Auth"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": false,
+          "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {"type": "string"},
-                  "email": {"type": "string"},
-                  "password": {"type": "string"},
+                  "fullName": {"type": "string"},
+                  "phone": {"type": "string"},
+                  "dob": {"type": "string", "format": "date"},
+                  "address": {"type": "string"},
                   "licenseNumber": {"type": "string"},
                   "nationalId": {"type": "string"},
                   "cccdImage": {"type": "string", "format": "binary"},
                   "driverLicenseImage": {"type": "string", "format": "binary"}
-                },
-                "required": ["name","email","password","licenseNumber","nationalId","cccdImage","driverLicenseImage"]
+                }
               }
             }
           }

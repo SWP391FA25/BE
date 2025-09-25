@@ -7,8 +7,14 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   dob: { type: Date },
   address: { type: String },
+  // Giấy tờ tuỳ thân & bằng lái (tùy chọn, có thể bổ sung sau đăng ký)
+  licenseNumber: { type: String },
+  nationalId: { type: String },
+  nationalIdImage: { type: String },
+  driverLicenseImage: { type: String },
   // Trạng thái
   isVerified: { type: Boolean, default: false },
+  verifyNote: { type: String, default: "" },
   // Timestamps
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

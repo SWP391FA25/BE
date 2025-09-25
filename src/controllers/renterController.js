@@ -40,6 +40,13 @@ const listAvailableVehicles = async (req, res) => {
 // Đặt trước xe
 const createReservation = async (req, res) => {
   try {
+    // Chặn thuê nếu chưa được xác minh hồ sơ
+    if (!req.user?.isVerified) {
+      return res.status(403).json({
+        message: "Tài khoản chưa được xác minh. Vui lòng cập nhật số điện thoại, CCCD và Bằng lái để được duyệt trước khi thuê xe."
+      });
+    }
+
     const { vehicleId, pickupStationId, pricePerHour, depositAmount } = req.body;
     const vehicle = await Vehicle.findById(vehicleId);
     if (!vehicle) return res.status(404).json({ message: "Không tìm thấy xe" });

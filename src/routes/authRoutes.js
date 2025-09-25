@@ -1,25 +1,30 @@
 const express = require("express");
 const multer = require("multer");
-const { register, login } = require("../controllers/authController");
+const { register, login, updateProfile } = require("../controllers/authController");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Multer config (upload CCCD)
+// Routes
+router.post("/register", register);
+router.post("/login", login);
+
+// Upload ảnh hồ sơ (CCCD/Bằng lái)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
-// Routes
-router.post(
-  "/register",
+// Cập nhật hồ sơ cá nhân
+router.put(
+  "/me/profile",
+  protect,
   upload.fields([
     { name: "cccdImage", maxCount: 1 },
     { name: "driverLicenseImage", maxCount: 1 },
   ]),
-  register
+  updateProfile
 );
-router.post("/login", login);
 
 module.exports = router;

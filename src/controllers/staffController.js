@@ -8,7 +8,7 @@ const Station = require("../models/Station");
  */
 const getPendingUsers = async (req, res) => {
   try {
-    const users = await User.find({ verified: false });
+    const users = await User.find({ isVerified: false });
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -25,7 +25,22 @@ const verifyUser = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
 
-    user.verified = status === "approved";
+    // Nếu duyệt, cần kiểm tra đã đủ hồ sơ
+    if (status === "approved") {
+      const hasPhone = !!user.phone;
+      const hasNationalId = !!user.nationalId;
+      const hasLicense = !!user.licenseNumber;
+      const hasCCCDImg = !!user.nationalIdImage;
+      const hasDLImg = !!user.driverLicenseImage;
+      if (!hasPhone || !hasNationalId || !hasLicense || !hasCCCDImg || !hasDLImg) {
+        return res.status(400).json({
+          message: "Hồ sơ chưa đầy đủ. Cần phone, nationalId, licenseNumber, nationalIdImage, driverLicenseImage để duyệt."
+        });
+      }
+      user.isVerified = true;
+    } else if (status === "rejected") {
+      user.isVerified = false;
+    }
     user.verifyNote = note || "";
 
     await user.save();
