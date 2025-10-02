@@ -4,9 +4,13 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   passwordHash: { type: String, required: true },
   fullName: { type: String, required: true },
+  avatarUrl: { type: String },
   phone: { type: String },
   dob: { type: Date },
   address: { type: String },
+  ward: { type: String },
+  district: { type: String },
+  city: { type: String },
   // Giấy tờ tuỳ thân & bằng lái (tùy chọn, có thể bổ sung sau đăng ký)
   licenseNumber: { type: String },
   nationalId: { type: String },

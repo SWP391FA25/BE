@@ -131,11 +131,37 @@
                   "phone": {"type": "string"},
                   "dob": {"type": "string", "format": "date"},
                   "address": {"type": "string"},
+                  "ward": {"type": "string"},
+                  "district": {"type": "string"},
+                  "city": {"type": "string"},
                   "licenseNumber": {"type": "string"},
                   "nationalId": {"type": "string"},
+                  "avatarImage": {"type": "string", "format": "binary"},
                   "cccdImage": {"type": "string", "format": "binary"},
                   "driverLicenseImage": {"type": "string", "format": "binary"}
                 }
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/api/auth/me/change-password": {
+      "post": {
+        "tags": ["Auth"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {"type": "string"},
+                  "newPassword": {"type": "string"}
+                },
+                "required": ["currentPassword", "newPassword"]
               }
             }
           }
