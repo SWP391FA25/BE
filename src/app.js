@@ -15,12 +15,14 @@ const adminRoutes = require('./routes/adminRoutes');
 const renterRoutes = require('./routes/renterRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const publicCatalogRoutes = require('./routes/publicCatalogRoutes');
 
 // Routes
 app.use('/api', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/renter', renterRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/public', publicCatalogRoutes);
 
 // mount at /api/chatboxai to match OpenAPI snippet
 app.use('/api/chatboxai', aiRoutes);
