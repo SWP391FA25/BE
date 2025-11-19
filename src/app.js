@@ -16,6 +16,8 @@ const renterRoutes = require('./routes/renterRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const publicCatalogRoutes = require('./routes/publicCatalogRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const contractRoutes = require('./routes/contractRoutes');
 
 // Routes
 app.use('/api', authRoutes);
@@ -23,6 +25,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/renter', renterRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/public', publicCatalogRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/contracts', contractRoutes);
 
 // mount at /api/chatboxai to match OpenAPI snippet
 app.use('/api/chatboxai', aiRoutes);

@@ -12,6 +12,9 @@ router.post("/reservations", ctrl.createReservation);
 router.get("/me/rentals", ctrl.myRentals);
 router.get("/me/analytics", ctrl.myAnalytics);
 
+// DEBUG endpoint (temporary)
+router.get("/debug/all-rentals", ctrl.debugAllRentals);
+
 module.exports = router;
 
 

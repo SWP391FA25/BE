@@ -9,6 +9,10 @@ router.get("/vehicles/:id", ctrl.getCatalogVehicleById);
 router.get("/vehicle/by/:identifier", ctrl.getByIdentifier);
 router.get("/backgrounds", ctrl.getBackgrounds);
 
+// Stations
+router.get("/stations", ctrl.listStations);
+router.get("/stations/:stationId/vehicles", ctrl.getVehiclesByStation);
+
 module.exports = router;
 
 

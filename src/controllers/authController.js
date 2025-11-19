@@ -50,7 +50,7 @@ const login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
     const token = jwt.sign(
-      { id: user._id, roleId: user.roleId },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -59,7 +59,7 @@ const login = async (req, res) => {
     ? "Đăng nhập thành công"
     : "Tài khoản chưa được xác minh. Hãy bổ sung số điện thoại, CCCD và Bằng lái để được duyệt.";
 
-  res.json({ token, roleId: user.roleId, isVerified: user.isVerified, message });
+  res.json({ token, role: user.role, isVerified: user.isVerified, fullName: user.fullName, email: user.email, message });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   passwordHash: { type: String, required: true },
   fullName: { type: String, required: true },
+  role: { type: String, enum: ["renter", "staff", "admin"], default: "renter" },
   avatarUrl: { type: String },
   phone: { type: String },
   dob: { type: Date },
@@ -19,6 +20,9 @@ const userSchema = new mongoose.Schema({
   // Trạng thái
   isVerified: { type: Boolean, default: false },
   verifyNote: { type: String, default: "" },
+  risky: { type: Boolean, default: false }, // Đánh dấu khách hàng rủi ro
+  // Liên kết với trạm (cho staff)
+  stationId: { type: mongoose.Schema.Types.ObjectId, ref: "Station", default: null },
   // Timestamps
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

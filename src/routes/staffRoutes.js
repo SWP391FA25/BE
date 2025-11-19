@@ -7,6 +7,9 @@ const {
   updateVehicleByStaff,
   checkoutRental,
   checkinRental,
+  getStaffStation,
+  getStaffStats,
+  getRentalHistory,
 } = require("../controllers/staffController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 
@@ -22,6 +25,10 @@ const upload = multer({ storage });
 // Authz
 router.use(protect, authorize("staff", "admin"));
 
+// Thông tin trạm và thống kê
+router.get("/station", getStaffStation);
+router.get("/stats", getStaffStats);
+
 // Xác minh khách
 router.get("/pending-users", getPendingUsers);
 router.post("/verify", verifyUser);
@@ -29,6 +36,10 @@ router.post("/verify", verifyUser);
 // Xe theo trạm & cập nhật
 router.get("/vehicles", listStationVehicles);
 router.put("/vehicles/:id", updateVehicleByStaff);
+router.patch("/vehicles/:id/status", updateVehicleByStaff);
+
+// Lịch sử thuê xe
+router.get("/rentals/history", getRentalHistory);
 
 // Checkout/Checkin
 router.post("/rental/checkout", upload.fields([{ name: "photos", maxCount: 10 }]), checkoutRental);
