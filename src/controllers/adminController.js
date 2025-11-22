@@ -116,6 +116,12 @@ const updateVehicle = async (req, res) => {
     const { id } = req.params;
     // Map frontend fields to backend fields
     const mappedData = mapFrontendToBackend(req.body);
+
+    // Auto-sync isOutOfStock based on status
+    if (mappedData.status) {
+      mappedData.isOutOfStock = (mappedData.status === 'out_of_stock');
+    }
+
     const vehicle = await Vehicle.findByIdAndUpdate(id, mappedData, { new: true });
     if (!vehicle) return res.status(404).json({ message: "Vehicle không tồn tại" });
     // Map backend fields to frontend fields for response

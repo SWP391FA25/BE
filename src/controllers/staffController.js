@@ -79,20 +79,33 @@ const listStationVehicles = async (req, res) => {
           vehicle: vehicle._id,
           status: { $in: ['reserved', 'ongoing', 'checked_out'] }
         })
-          .populate('renter', 'fullName phone')
+          .populate('renter', 'fullName phone email address')
           .sort({ createdAt: -1 });
-        
+
         if (rental) {
-          const startDate = rental.checkoutTime || rental.reservationTime || rental.createdAt;
-          const endDate = rental.returnTime || rental.expectedReturnTime;
-          
+          // Lấy thời gian bắt đầu: ưu tiên pickupTime (thực tế), sau đó scheduledPickupDate (dự kiến)
+          const startDate = rental.pickupTime || rental.scheduledPickupDate || rental.createdAt;
+          const startTime = rental.pickupTime
+            ? new Date(rental.pickupTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+            : rental.scheduledPickupTime;
+
+          // Lấy thời gian kết thúc: ưu tiên returnTime (thực tế), sau đó scheduledReturnDate (dự kiến)
+          const endDate = rental.returnTime || rental.scheduledReturnDate;
+          const endTime = rental.returnTime
+            ? new Date(rental.returnTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+            : rental.scheduledReturnTime;
+
           vehicleObj.rentalInfo = {
+            _id: rental._id, // Add rental ID for frontend to fetch details
+            rentalId: rental._id, // Fallback field name
             renterName: rental.renter?.fullName,
             renterPhone: rental.renter?.phone,
+            renterEmail: rental.renter?.email,
+            renterAddress: rental.renter?.address,
             startDate: startDate ? new Date(startDate).toISOString().split('T')[0] : null,
-            startTime: startDate ? new Date(startDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null,
+            startTime: startTime || null,
             endDate: endDate ? new Date(endDate).toISOString().split('T')[0] : null,
-            endTime: endDate ? new Date(endDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null,
+            endTime: endTime || null,
             status: rental.status,
             totalAmount: rental.totalAmount
           };
@@ -137,6 +150,24 @@ const updateVehicleByStaff = async (req, res) => {
     ).populate('station');
     
     if (!vehicle) return res.status(404).json({ message: "Xe không tồn tại" });
+    
+    // Nếu update vehicle status sang 'rented', cũng update rental status
+    if (status === 'rented') {
+      await Rental.findOneAndUpdate(
+        { vehicle: id, status: 'reserved' },
+        { status: 'ongoing' }
+      );
+      console.log('✅ Updated rental status to ongoing for vehicle:', id);
+    }
+    
+    // Nếu update vehicle status sang 'available', cũng update rental status
+    if (status === 'available') {
+      await Rental.findOneAndUpdate(
+        { vehicle: id, status: { $in: ['ongoing', 'rented'] } },
+        { status: 'completed' }
+      );
+      console.log('✅ Updated rental status to completed for vehicle:', id);
+    }
     
     // Map backend fields to frontend format
     const mappedVehicle = mapBackendToFrontend(vehicle) || vehicle.toObject();

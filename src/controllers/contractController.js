@@ -25,13 +25,26 @@ const createContractFromRental = async (req, res) => {
       return res.status(403).json({ message: "Không có quyền tạo hợp đồng cho đơn này" });
     }
     
-    // TODO: Create actual contract document
-    // For now, return rental info
+    // TODO: Create actual contract document in Contract collection
+    // For now, return rental as contract (rental already has contract info)
     
     res.json({
       success: true,
-      message: "Contract creation logic will be implemented",
-      rental: rental
+      message: "Hợp đồng đã được tạo",
+      contract: {
+        _id: rental._id, // Tạm dùng rentalId làm contractId
+        rentalId: rental._id,
+        renter: rental.renter,
+        vehicle: rental.vehicle,
+        pickupStation: rental.pickupStation,
+        returnStation: rental.returnStation,
+        startDate: rental.startDate,
+        endDate: rental.endDate,
+        totalAmount: rental.totalAmount,
+        depositAmount: rental.depositAmount,
+        status: 'pending_signature',
+        createdAt: new Date()
+      }
     });
   } catch (err) {
     console.error("❌ createContractFromRental Error:", err);
@@ -345,7 +358,7 @@ const signContract = async (req, res) => {
     }
     
     // Check if already signed - return success (idempotent operation)
-    if (rental.status === 'confirmed' || rental.status === 'completed') {
+    if (rental.contractSignature && rental.contractSignature.signedAt) {
       console.log('✅ [signContract] Already signed, returning success (idempotent)');
       return res.json({
         success: true,
@@ -368,8 +381,8 @@ const signContract = async (req, res) => {
       userAgent: userAgent || req.headers['user-agent']
     };
     
-    // Update rental status after signing
-    rental.status = 'confirmed';
+    // Update rental contract signature (KHÔNG đổi status, giữ nguyên 'reserved')
+    // rental.status vẫn là 'reserved' cho đến khi staff xác nhận giao xe
     rental.contractSignature = signatureData; // Store signature data
     await rental.save();
     
